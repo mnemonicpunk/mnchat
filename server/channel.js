@@ -1,3 +1,5 @@
+const BOTNAME = "James";
+
 class Channel {
     constructor(name) {
         this.name = name;
@@ -47,6 +49,9 @@ class Channel {
         this.users.splice(idx, 1);
         this.broadcast('user_leave', user.id);
     }
+    sanitize(text) {
+        return text;
+    }
     findUserIndex(user) {
         for (let i=0; i<this.users.length; i++) {
             if (this.users[i].id == user.id) {
@@ -57,7 +62,7 @@ class Channel {
     }
     sendUserList(user) {
         let users = [{
-            'name': 'James-Bot',
+            'name': BOTNAME,
             'id': 0
         }];
         for (let i=0; i<this.users.length; i++) {
@@ -67,6 +72,14 @@ class Channel {
             });
         }
         user.sendMessage('user_list', users);
+    }
+    sendText(user, data) {
+        let d = this.sanitize(data);
+
+        this.broadcast('channel_text', {
+            name: user.name,
+            message: d
+        });
     }
 }
 
