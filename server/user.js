@@ -19,7 +19,6 @@ class User {
         });
     }
     send(msg) {
-        console.dir(msg);
         this.socket.send(JSON.stringify(msg));
     }
     sendMessage(type, data) {

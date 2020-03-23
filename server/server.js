@@ -13,10 +13,6 @@ class Server {
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
-
-        console.dir(CHANNEL_CFG);
-
-        //console.log(this.createUniqueID());
     }
     connectUser(ws) {
         var u = new User(ws, this);
@@ -35,10 +31,6 @@ class Server {
         }
         if (idx == -1) {
             console.log("Tried to disconnect user that does not exist: ");
-            console.dir({
-                name: user.name,
-                id: user.id
-            });
             return;
         }
         this.users.splice(idx, 1);

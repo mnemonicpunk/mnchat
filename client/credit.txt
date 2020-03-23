@@ -1,0 +1,1 @@
+MD5 implementation: https://github.com/blueimp/JavaScript-MD5

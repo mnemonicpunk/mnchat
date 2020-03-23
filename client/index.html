@@ -2,25 +2,67 @@
     <title>mnChat - Jetzt mit ohne Datenschutzbedenken!</title>
     <head>
         <link rel="stylesheet" href="./client.css">
+        <script src="md5.min.js"></script>
         <script src="client.js"></script>
     </head>
     <body>
-        <div id="menu_bar">
-            mnChat - Jetzt mit ohne Datenschutzbedenken!
-        </div>
-        <div id="channel_list">
-        </div>
-        <div id="chat_holder">
-            <div id="chat_content">
+        <div id="dialog_main" class="app_view">
+            <div id="menu_bar">
+                mnChat - Jetzt mit ohne Datenschutzbedenken!
             </div>
-            <div id="chat_text">
-                <input id="chat_msg_entry" type="edit">
+            <div id="channel_list">
+            </div>
+            <div id="chat_holder">
+                <div id="chat_content">
+                </div>
+                <div id="chat_text">
+                    <input id="chat_msg_entry" type="edit">
+                </div>
+            </div>
+            <div id="channel_users">
+            </div>    
+        </div>
+        <div id="dialog_register" class="app_view" style="display: none;">
+            <div id="register_login_dialog">
+                <div id="register_dialog">
+                    <div class="dialog_header">Registrieren</div>
+                    <div id="switch_to_login" class="dialog_switcher">
+                        Ich habe bereits einen Account und m&ouml;chte mich anmelden >>
+                    </div>
+                    <div id="username_entry" class="labeled_edit">
+                        <div class="labeled_edit_label">Benutzername:</div>
+                        <div class="labeled_edit_text"><input type="edit"></div>
+                    </div>
+                    <div id="pw1_entry" class="labeled_edit">
+                        <div class="labeled_edit_label">Passwort:</div>
+                        <div class="labeled_edit_text"><input type="edit"></div>
+                    </div>
+                    <div id="pw2_entry" class="labeled_edit">
+                        <div class="labeled_edit_label">Passwort (wiederholen):</div>
+                        <div class="labeled_edit_text"><input type="edit"></div>
+                    </div>
+                    <input id="register_confirm_btn" class="dialog_button" type="button" value="Registrieren">
+                </div>
             </div>
         </div>
-        <div id="channel_users">
-        </div>
-        <div id="fullscreen_overlay">
-            
-        </div>
+        <div id="dialog_login" class="app_view" style="display: none;">
+            <div id="register_login_dialog">
+                <div id="login_dialog">
+                    <div class="dialog_header">Anmelden</div>
+                    <div id="switch_to_register" class="dialog_switcher">
+                        << Ich habe noch keinen Account und m&ouml;chte mich registrieren
+                    </div>
+                    <div id="username_entry" class="labeled_edit">
+                        <div class="labeled_edit_label">Benutzername:</div>
+                        <div class="labeled_edit_text"><input type="edit"></div>
+                    </div>
+                    <div id="pw1_entry" class="labeled_edit">
+                        <div class="labeled_edit_label">Passwort:</div>
+                        <div class="labeled_edit_text"><input type="edit"></div>
+                    </div>
+                    <input id="register_confirm_btn" class="dialog_button" type="button" value="Anmelden">
+                </div>
+            </div>
+        </div>        
     </body>
 </html>
