@@ -1,7 +1,21 @@
+const ACCOUNT_PATH = "./data/account/";
+const TOKEN_PATH = "./data/token/";
+
+var fs = require('fs');
 var User = require('./user.js');
 var Channel = require('./channel.js');
 
 var CHANNEL_CFG = require('../config/channels.json');
+
+var genString = function(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;    
+}
 
 class Server {
     constructor() {
@@ -13,6 +27,9 @@ class Server {
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
+
+        console.log(this.registerAccount("joshua", "12345"));
+        console.log(this.loginAccount("Joshua", "12345"));
     }
     connectUser(ws) {
         var u = new User(ws, this);
@@ -37,17 +54,6 @@ class Server {
     }
     createUniqueID() {
         let length = 16;
-
-        var genString = function(length) {
-            var result           = '';
-            var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            var charactersLength = characters.length;
-            for ( var i = 0; i < length; i++ ) {
-               result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            }
-            return result;    
-        }
-
         let unique_id = false;
         let id = genString(length);
         while (unique_id == false) {
@@ -69,6 +75,75 @@ class Server {
             });
         }
         user.sendMessage('channel_list', l);
+    }
+    getAccountNameFromString(text) {
+        let valid_characters = "abcdefghijklmnopqrstuvwxyz1234567890";
+        let ctext = "";
+
+        for (let i=0; i<text.length; i++) {
+            let c = text[i].toLowerCase();
+            for (let j = 0; j<valid_characters.length; j++) {
+                if (c == valid_characters[j]) {
+                    ctext += c;
+                }
+            }
+        }
+
+        return ctext;
+    }
+    registerAccount(name, pw_hash) {
+        let n = this.getAccountNameFromString(name);
+        let fn = ACCOUNT_PATH + n + ".account";
+
+        let data = {
+            name: name,
+            pw_hash: pw_hash
+        }
+
+        if (!this.existsAccount(n)) {
+            fs.writeFileSync(fn, JSON.stringify(data), { flag: 'w'});
+            return true;
+        }
+        return false;
+    }
+    loginAccount(name, pw_hash) {
+        let n = this.getAccountNameFromString(name);
+        let fn = ACCOUNT_PATH + n + ".account";
+
+        if (!this.existsAccount(name)) { return null; }
+
+        let a = JSON.parse(fs.readFileSync(fn).toString('utf8'));
+        if (a.pw_hash != pw_hash) { return null; }
+
+        let token = this.getAccountToken(name);
+        return token;
+    }
+    existsAccount(name) {
+        let n = this.getAccountNameFromString(name);
+        return fs.existsSync(ACCOUNT_PATH + n + ".account");
+    }
+    createAccountToken(name) {
+        let n = this.getAccountNameFromString(name);
+        let fn = TOKEN_PATH + n + ".token";
+        let length = 128;
+
+        let token = genString(length);
+        let data = {
+            name: n,
+            token: token
+        };
+        fs.writeFileSync(fn, JSON.stringify(data));
+    }
+    getAccountToken(name) {
+        let n = this.getAccountNameFromString(name);
+        let fn = TOKEN_PATH + n + ".token";
+
+        if (!fs.existsSync(TOKEN_PATH + n + ".token")) {
+            this.createAccountToken(name);
+        }
+
+        let token = JSON.parse(fs.readFileSync(fn).toString('utf8'));
+        return token;
     }
 }
 
