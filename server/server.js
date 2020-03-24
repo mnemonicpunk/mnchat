@@ -28,6 +28,18 @@ class Server {
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
+
+        var _Instance = this;
+        var _tick = function() {
+            _Instance.tick();
+            setTimeout(_tick, 1000);
+        };
+        _tick();
+    }
+    tick() {
+        for (let i=0; i<this.users.length; i++) {
+            this.users[i].tick();
+        }
     }
     connectUser(ws) {
         var u = new User(ws, this);
@@ -44,7 +56,7 @@ class Server {
             }
         }
         if (idx == -1) {
-            console.log("Tried to disconnect user that does not exist: ");
+            console.log("Tried to disconnect user that does not exist: " + user.id + " // " + user.name);
             return;
         }
         this.users.splice(idx, 1);
@@ -64,11 +76,20 @@ class Server {
         }   
         return id;
     }
+    getChannelByName(name) {
+        for (let i=0; i<this.channels.length; i++) {
+            if (this.channels[i].name == name) {
+                return this.channels[i];
+            }
+        }
+        return null;
+    }
     sendChannelList(user) {
         let l = [];
         for (let i=0; i<this.channels.length; i++) {
             l.push({
-                name: this.channels[i].name
+                name: this.channels[i].name,
+                id: i
             });
         }
         user.sendMessage('channel_list', l);

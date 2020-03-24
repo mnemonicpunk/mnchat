@@ -25,6 +25,7 @@ class Channel {
         return this.messages;
     }
     canJoin(user) {
+        if (user.account == null) { return false; }
         return true;
     }
     broadcast(type, data) {
@@ -37,13 +38,17 @@ class Channel {
         }
     }
     join(user) {
+        if (!this.canJoin(user)) {
+            return false;
+        }
         this.broadcast('user_join', {
-            'user_name': user.name,
-            'user_id': user.id
+            name: user.getName(),
+            id: user.id
         });
         this.users.push(user);
         this.sendUserList(user);
         this.sendLog(user);
+        this.sendChannelName(user);
 
         return true;
     }
@@ -78,6 +83,9 @@ class Channel {
     }
     sendText(user, data) {
         let d = this.sanitize(data);
+
+        if (data == "") { return; }
+
         let msg = {
             name: user.getName(),
             message: d
@@ -85,6 +93,9 @@ class Channel {
 
         this.broadcast('channel_text', msg);
         this.log.push(msg);
+    }
+    sendChannelName(user) {
+        user.sendMessage('channel_name', this.name);
     }
     sendLog(user) {
         user.sendLog(this.log);

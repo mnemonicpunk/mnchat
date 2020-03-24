@@ -1,10 +1,14 @@
 [
     {
-        "name": "System",
+        "name": "Allgemein",
         "permissions": [] 
     },
     {
-        "name": "Testchannel",
+        "name": "Eltern",
         "permissions": [] 
-    }
+    },
+    {
+        "name": "GHS F5C",
+        "permissions": [] 
+    }    
 ]

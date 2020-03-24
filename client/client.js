@@ -10,8 +10,8 @@ class ClientUI {
         this.user_list = document.querySelector('#channel_users');
         this.chat_window = document.querySelector('#chat_content');
 
-        this.show_channels = false;
-        this.show_users = false;
+        this.show_channels = (localStorage.show_channels=="on"?true:false);
+        this.show_users = (localStorage.show_users=="on"?true:false);
 
         this.chat_box = document.querySelector('#chat_msg_entry');
         this.chat_box.addEventListener('keydown', function(e) {
@@ -69,18 +69,48 @@ class ClientUI {
         }
     }
     setChannelList(channels) {
+        var _Instance = this;
+
         this.clearChannelList();
         for (let i=0; i<channels.length; i++) {
             let channel_el = document.createElement('div');
             channel_el.className = "channel_list_entry";
             channel_el.innerHTML = channels[i].name||"Unbenannter Channel";
+
+            if (channels[i].name) {
+                let cname = channels[i].name;
+                channel_el.addEventListener('click', function() {
+                    _Instance.client.joinChannel(cname);
+                });
+            }
+
             this.channel_list.appendChild(channel_el);
         }        
     }
-    addTextMessage(name, message) {
+    clearMessages() {
+        while(this.chat_window.hasChildNodes()) {
+            this.chat_window.removeChild(this.chat_window.firstChild);
+        }
+    }
+    addTextMessage(msg) {
+        let name = msg.name;
+        let message = msg.message;
+
         let el = document.createElement('div');
-        el.className = "chat_text_message";
-        el.innerHTML = "<b>" + name + ":</b> " + message;
+        el.className = "chat_message";
+
+        let el_user = document.createElement('div');
+        let el_text = document.createElement('div');
+
+        el_user.className = "chat_message_user";
+        el_text.className = "chat_message_text";
+
+        el_user.innerHTML = name;
+        el_text.innerHTML = message;
+
+        el.appendChild(el_user);
+        el.appendChild(el_text);
+
         this.chat_window.appendChild(el);
     }
     modalDialog(name) {
@@ -123,11 +153,17 @@ class ClientUI {
     showChannelList(state) {
         this.show_channels = state;
         this.channel_list.style.display = state?"block":"none";
+
+        localStorage.show_channels = state?"on":"off";
+
         this.repositionChat();
     }
     showUserList(state) {
         this.show_users = state;
         this.user_list.style.display = state?"block":"none";
+
+        localStorage.show_users = state?"on":"off";
+
         this.repositionChat();
     }
     repositionChat() {
@@ -136,6 +172,10 @@ class ClientUI {
         let w = "width: calc(100% - " + ((this.show_channels + this.show_users) * 200) + "px);";
         console.log(w);
         chat.style = l+w;
+    }
+    setChannelName(name) {
+        let cname = document.querySelector('#app_channel');
+        cname.innerHTML = name;
     }
 }
 
@@ -178,8 +218,17 @@ class Client {
                 this.users = msg.data;
                 this.ui.setUserList(this.users);
                 break;
+            case "user_join":
+                this.userJoin(msg.data);
+                break;
+            case "user_leave":
+                this.userLeave(msg.data);
+                break;    
             case "channel_text":
-                this.getTextMessage(msg.data.name, msg.data.message);
+                this.getTextMessage(msg.data);
+                break;
+            case "channel_name":
+                this.ui.setChannelName(msg.data);
                 break;
             case "channel_list": 
                 this.channel_list = msg.data;
@@ -187,6 +236,8 @@ class Client {
                 break;
             case "account_token":
                 this.setCredentials(msg.data.name, msg.data.token);
+                this.ui.modalDialog("");
+                this.authWithToken();
                 break;
             case "auth_success":
                 console.log("Authenticated!");
@@ -200,6 +251,13 @@ class Client {
             case "channel_log":
                 this.getLog(msg.data);
                 break;
+            case "auth_failed":
+                this.setCredentials("", "");
+                this.modalDialog("register");
+                break;
+            case "keep_alive":
+                this.sendMessage('keep_alive', {});
+                break;    
             default:
                 break;
         }
@@ -207,12 +265,13 @@ class Client {
     chatMessage(message) {
         this.sendMessage('chat_message', message);
     }
-    getTextMessage(name, message) {
-        this.ui.addTextMessage(name, message);
+    getTextMessage(message) {
+        this.ui.addTextMessage(message);
     }
     getLog(log) {
+        this.ui.clearMessages();
         for (let i=0; i<log.length; i++) {
-            this.getTextMessage(log[i].name, log[i].message);
+            this.getTextMessage(log[i]);
         }
     }
     doRegister(username, password) {
@@ -249,7 +308,34 @@ class Client {
             name: uname,
             token: token
         };
-    } 
+    }
+    getUserByID(id) {
+        let idx = this.getTextMessage(id);
+        if (idx != -1) {
+            return this.users[i];
+        }
+        return null;
+    }
+    getUserIndex(id) {
+        for (let i=0; i<this.users.length; i++) {
+            if (this.users[i].id == id) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    userJoin(user) {
+        this.users.push(user);
+        this.ui.setUserList(this.users);
+    }
+    userLeave(user) {
+        let idx = this.getUserIndex(user.id);
+        this.users.splice(idx, 1);
+        this.ui.setUserList(this.users);
+    }
+    joinChannel(name) {
+        this.sendMessage('join_channel', name);
+    }
 }
 
 window.addEventListener('load', function() {

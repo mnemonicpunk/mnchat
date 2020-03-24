@@ -1,5 +1,8 @@
 var Account = require('./account.js');
 
+const KEEP_ALIVE_PING = 10;
+const KEEP_ALIVE_TIMEOUT = 30;
+
 class User {
     constructor(ws, server) {
         var _Instance = this;
@@ -16,12 +19,32 @@ class User {
         });
         this.socket.on('close', function(e) {
             _Instance.leaveChannel();
-            _Instance.server.disconnectUser(this);
+            _Instance.server.disconnectUser(_Instance);
             console.log("User " + _Instance.id + " has disconnected.");
         });
+        this.socket.on('error', function(e) {
+            _Instance.leaveChannel();
+            _Instance.server.disconnectUser(_Instance);
+            console.log("User " + _Instance.id + " has disconnected.");
+        });        
+
+        this.keep_alive = 0;
+    }
+    tick() {
+        this.keep_alive++;
+        if (this.keep_alive > KEEP_ALIVE_PING) {
+            this.keepAlive();
+        }
+        if (this.keep_alive > KEEP_ALIVE_TIMEOUT) {
+            this.socket.close();
+        }
     }
     send(msg) {
-        this.socket.send(JSON.stringify(msg));
+        try {
+            this.socket.send(JSON.stringify(msg));
+        } catch(e) {
+            console.dir(e);
+        }
     }
     sendMessage(type, data) {
         this.send({
@@ -52,14 +75,26 @@ class User {
                 case "register_account":
                     this.doRegister(data.name, data.pw_hash);
                     break;
+                case "keep_alive":
+                    break;    
+                case "join_channel":
+                    let channel = this.server.getChannelByName(data);
+                    if (channel != null) {
+                        this.joinChannel(channel);
+                    }
+                    break;        
                 default: 
                     console.log(type);
                     console.dir(data);
                     break;
             }    
+            this.keep_alive = 0;
         } catch(e) {
             console.dir(e);
         }
+    }
+    keepAlive() {
+        this.sendMessage('keep_alive', {});
     }
     errorMessage(message) {
         this.sendMessage('error_msg', message);
@@ -69,8 +104,11 @@ class User {
         return (this.account.data.name);
     }
     joinChannel(c) {
-        if (c.join(this)) {
-            this.channel = c;
+        if (c.canJoin(this)) {
+            this.leaveChannel();
+            if (c.join(this)) {
+                this.channel = c;
+            }
         }
     }
     leaveChannel() {
@@ -100,6 +138,7 @@ class User {
     }
     doAuth(token) {
         if ((token.name =="") || (token.token =="")) {
+            this.authFailed();
             return;
         }
 
@@ -109,12 +148,16 @@ class User {
             this.sendMessage('my_details', {
                 name: this.getName()
             });
+            this.joinChannel(this.server.system_channel);
+        } else {
+            this.authFailed();
         }
-
-        this.joinChannel(this.server.system_channel);
     }
     sendLog(log) {
         this.sendMessage('channel_log', log);
+    }
+    authFailed() {
+        this.sendMessage('auth_failed', {});
     }
 }
 

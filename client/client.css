@@ -1,9 +1,9 @@
 :root {
-    --menu-bar-color: #222;
-    --main-bg-color: #555;
-    --menu-bg-color: #333;
+    --menu-bar-color: #224;
+    --main-bg-color: #557;
+    --menu-bg-color: #335;
     --main-font-color: #ddd;
-    --msg-bg-color: #444;
+    --msg-bg-color: #446;
 }
 
 body {
@@ -28,20 +28,23 @@ body {
 }
 
 .menu_segment_small {
-    width: 20%;
+    width: 200px;
+    height: 100%;
     display: inline-block;
     text-align: center;
     user-select: none;
 }
 
 .menu_segment_small:hover {
-    text-decoration: underline;
+    background: var(--menu-bg-color);
+    border-radius: 5px;
     cursor: pointer;
     user-select: none;
 }
 
 .menu_segment_large {
-    width: 59%;
+    width: calc(100% - 420px);
+    height: 100%;
     display: inline-block;
     text-align: center;
     user-select: none;
@@ -85,8 +88,10 @@ body {
 #chat_content {
     width: calc(100% - 20px);
     height: calc(100% - 80px);
-    padding: 10px;
+    margin: 10px;
     background: var(--main-bg-color);
+
+    overflow: auto;
 }
 
 #chat_text {
@@ -119,7 +124,7 @@ body {
 }
 
 .channel_list_entry:hover {
-    background: #222;
+    background: var(--menu-bar-color);
     cursor: pointer;
     border-radius: 5px;
 }
@@ -130,7 +135,7 @@ body {
 }
 
 .user_list_entry:hover {
-    background: #222;
+    background: var(--menu-bar-color);
     cursor: pointer;
     border-radius: 5px;
     
@@ -230,4 +235,21 @@ body {
 .dialog_switcher:hover {
     text-decoration: underline;
     cursor: pointer;
+}
+
+.chat_message {
+    padding: 10px;
+    line-height: 20px;
+}
+
+.chat_message_user {
+    background: var(--msg-bg-color);
+    float: left;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 10px;
+}
+
+.chat_message_text {
+    padding: 10px;
 }
