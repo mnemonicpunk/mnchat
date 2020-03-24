@@ -1,4 +1,5 @@
 const SERVER_ADDR = "ws://localhost:8000/chat";
+const PW_SALT = "FOOBARCOVID19";
 
 class ClientUI {
     constructor(client) {
@@ -15,6 +16,23 @@ class ClientUI {
                 _Instance.client.chatMessage(_Instance.chat_box.value);
                 _Instance.chat_box.value = "";
             }
+        });
+
+        let dialog_register = document.querySelector("#dialog_register");
+        let dialog_login = document.querySelector("#dialog_login");
+
+        dialog_register.querySelector("#switch_to_login").addEventListener('click', function() {
+            _Instance.modalDialog("login");
+        });
+        dialog_login.querySelector("#switch_to_register").addEventListener('click', function() {
+            _Instance.modalDialog("register");
+        });        
+
+        dialog_register.querySelector("#register_confirm_btn").addEventListener('click', function() {
+            _Instance.doRegister();
+        });
+        dialog_login.querySelector("#login_confirm_btn").addEventListener('click', function() {
+            _Instance.doLogin();
         });
     }
     clearUserList() {
@@ -51,6 +69,43 @@ class ClientUI {
         el.innerHTML = "<b>" + name + ":</b> " + message;
         this.chat_window.appendChild(el);
     }
+    modalDialog(name) {
+        let dialog_register = document.querySelector("#dialog_register");
+        let dialog_login = document.querySelector("#dialog_login");
+
+        dialog_register.style = "display: none;";
+        dialog_login.style = "display: none;";
+
+        switch (name) {
+            case "register":
+                dialog_register.style = "display: block;";
+                break;
+            case "login":
+                dialog_login.style = "display: block;";
+                break;    
+            default: 
+                break;
+        }
+    }
+    doRegister() {
+        let dialog_register = document.querySelector("#dialog_register");
+        let uname = dialog_register.querySelector("#reg_uname").value;
+        let pw1 = dialog_register.querySelector("#reg_pw1").value;
+        let pw2 = dialog_register.querySelector("#reg_pw2").value;
+
+        if (pw1 != pw2) {
+            alert("Die Passwörter sind nicht gleich!");
+        }
+
+        this.client.doRegister(uname, pw1);
+    }
+    doLogin() {
+        let dialog_login = document.querySelector("#dialog_login");
+        let uname = dialog_login.querySelector("#log_uname").value;
+        let pw1 = dialog_login.querySelector("#log_pw1").value;
+
+        this.client.doLogin(uname, pw1);
+    }    
 }
 
 class Client {
@@ -63,11 +118,21 @@ class Client {
 
         this.socket = new WebSocket(server_addr);
         this.socket.addEventListener('open', function() {
-            _Instance.sendMessage('get_user_list', '');
+            _Instance.authWithToken();
         });
         this.socket.addEventListener('message', function(e) {
             _Instance.handleMessage(JSON.parse(e.data));
-        });            
+        });
+        
+        console.dir(this.token());
+    }
+    authWithToken() {
+        let token = this.token();
+        if ((token.token == "") || (token.token == "")) {
+            this.ui.modalDialog("register");
+        }
+
+        this.sendMessage('auth', token);
     }
     sendMessage(type, data) {
         let d = {
@@ -88,6 +153,19 @@ class Client {
             case "channel_list": 
                 this.channel_list = msg.data;
                 this.ui.setChannelList(this.channel_list);
+                break;
+            case "account_token":
+                this.setCredentials(msg.data.name, msg.data.token);
+                break;
+            case "auth_success":
+                console.log("Authenticated!");
+                break;
+            case "my_details":
+                console.dir(msg.data);
+                break;
+            case "error_msg":
+                alert(msg.data);
+                break;
             default:
                 break;
         }
@@ -98,6 +176,41 @@ class Client {
     getTextMessage(name, message) {
         this.ui.addTextMessage(name, message);
     }
+    doRegister(username, password) {
+        let uname = username;
+        let pw = md5(password + PW_SALT);
+
+        this.sendMessage('register_account', {
+            name: uname,
+            pw_hash: pw
+        });        
+    }
+    doLogin(username, password) {
+        let uname = username;
+        let pw = md5(password + PW_SALT);
+
+        this.sendMessage('obtain_token', {
+            name: uname,
+            pw_hash: pw
+        });
+    }
+    setCredentials(name, token) {
+        console.dir({
+            name: name,
+            token: token
+        });
+        localStorage.account_name = name;
+        localStorage.account_token = token;
+    }
+    token() {
+        let uname = localStorage.account_name || "";
+        let token = localStorage.account_token || "";
+
+        return {
+            name: uname,
+            token: token
+        };
+    } 
 }
 
 window.addEventListener('load', function() {

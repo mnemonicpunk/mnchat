@@ -1,4 +1,4 @@
-const BOTNAME = "James";
+const BOTNAME = "Nanny";
 
 class Channel {
     constructor(name) {
@@ -77,7 +77,7 @@ class Channel {
         let d = this.sanitize(data);
 
         this.broadcast('channel_text', {
-            name: user.name,
+            name: user.getName(),
             message: d
         });
     }

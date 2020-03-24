@@ -23,7 +23,7 @@
             </div>    
         </div>
         <div id="dialog_register" class="app_view" style="display: none;">
-            <div id="register_login_dialog">
+            <div class="register_login_dialog">
                 <div id="register_dialog">
                     <div class="dialog_header">Registrieren</div>
                     <div id="switch_to_login" class="dialog_switcher">
@@ -31,22 +31,22 @@
                     </div>
                     <div id="username_entry" class="labeled_edit">
                         <div class="labeled_edit_label">Benutzername:</div>
-                        <div class="labeled_edit_text"><input type="edit"></div>
+                        <div class="labeled_edit_text"><input id="reg_uname" type="edit"></div>
                     </div>
                     <div id="pw1_entry" class="labeled_edit">
                         <div class="labeled_edit_label">Passwort:</div>
-                        <div class="labeled_edit_text"><input type="edit"></div>
+                        <div class="labeled_edit_text"><input id="reg_pw1" type="edit"></div>
                     </div>
                     <div id="pw2_entry" class="labeled_edit">
                         <div class="labeled_edit_label">Passwort (wiederholen):</div>
-                        <div class="labeled_edit_text"><input type="edit"></div>
+                        <div class="labeled_edit_text"><input id="reg_pw2" type="edit"></div>
                     </div>
                     <input id="register_confirm_btn" class="dialog_button" type="button" value="Registrieren">
                 </div>
             </div>
         </div>
         <div id="dialog_login" class="app_view" style="display: none;">
-            <div id="register_login_dialog">
+            <div class="register_login_dialog">
                 <div id="login_dialog">
                     <div class="dialog_header">Anmelden</div>
                     <div id="switch_to_register" class="dialog_switcher">
@@ -54,13 +54,13 @@
                     </div>
                     <div id="username_entry" class="labeled_edit">
                         <div class="labeled_edit_label">Benutzername:</div>
-                        <div class="labeled_edit_text"><input type="edit"></div>
+                        <div class="labeled_edit_text"><input id="log_uname" type="edit"></div>
                     </div>
                     <div id="pw1_entry" class="labeled_edit">
                         <div class="labeled_edit_label">Passwort:</div>
-                        <div class="labeled_edit_text"><input type="edit"></div>
+                        <div class="labeled_edit_text"><input id="log_pw1" type="edit"></div>
                     </div>
-                    <input id="register_confirm_btn" class="dialog_button" type="button" value="Anmelden">
+                    <input id="login_confirm_btn" class="dialog_button" type="button" value="Anmelden">
                 </div>
             </div>
         </div>        

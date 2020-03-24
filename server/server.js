@@ -28,21 +28,12 @@ class Server {
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
-
-        let n = "joshua";
-        let pwh = "12345";
-        let a = null;
-        if (this.authWithToken(n, this.loginAccount(n, pwh))) {
-            a = new Account(n);
-        }
-        console.dir(a);
     }
     connectUser(ws) {
         var u = new User(ws, this);
         u.id = this.createUniqueID();
         
         this.users.push(u);
-        u.joinChannel(this.system_channel);
         this.sendChannelList(u);
     }
     disconnectUser(user) {
@@ -149,10 +140,8 @@ class Server {
                 this.createAccountToken(name);
             } else {
                 return null;
-            }
-            
+            }         
         }
-
         let token = JSON.parse(fs.readFileSync(fn).toString('utf8'));
         return token;
     }

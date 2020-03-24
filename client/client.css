@@ -117,7 +117,7 @@ body {
     
 }
 
-#register_login_dialog {
+.register_login_dialog {
     position: absolute;
     background: var(--menu-bg-color);
     color: #fff;
@@ -168,13 +168,17 @@ body {
 }
 
 .labeled_edit_text input[type="edit"] {
-    width: 100%;
+    width: calc(100% - 20px);
     height: 44px;
     background: var(--main-bg-color);
+    color: #fff;
+
+    padding: 10px;
 
     border-radius: 5px;
     border: none;
     outline: none;
+
 }
 
 .dialog_button {
