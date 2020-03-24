@@ -113,6 +113,9 @@ class User {
 
         this.joinChannel(this.server.system_channel);
     }
+    sendLog(log) {
+        this.sendMessage('channel_log', log);
+    }
 }
 
 module.exports = User;

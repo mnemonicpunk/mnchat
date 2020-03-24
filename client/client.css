@@ -27,6 +27,26 @@ body {
     padding: 20px;
 }
 
+.menu_segment_small {
+    width: 20%;
+    display: inline-block;
+    text-align: center;
+    user-select: none;
+}
+
+.menu_segment_small:hover {
+    text-decoration: underline;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu_segment_large {
+    width: 59%;
+    display: inline-block;
+    text-align: center;
+    user-select: none;
+}
+
 #channel_list {
     position: absolute;
     top: 60px;
@@ -45,7 +65,6 @@ body {
     top: 60px;
     left: 200px;
 
-    width: calc(100% - 400px);
     height: calc(100% - 60px);
     background:  var(--main-bg-color);
 }
@@ -178,7 +197,18 @@ body {
     border-radius: 5px;
     border: none;
     outline: none;
+}
+.labeled_edit_text input[type="password"] {
+    width: calc(100% - 20px);
+    height: 44px;
+    background: var(--main-bg-color);
+    color: #fff;
 
+    padding: 10px;
+
+    border-radius: 5px;
+    border: none;
+    outline: none;
 }
 
 .dialog_button {

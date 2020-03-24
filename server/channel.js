@@ -5,6 +5,8 @@ class Channel {
         this.name = name;
         this.users = [];
         this.messages = [];
+
+        this.log = [];
     }
     addUser(user) {
         if (!(user in this.users)) {
@@ -41,6 +43,7 @@ class Channel {
         });
         this.users.push(user);
         this.sendUserList(user);
+        this.sendLog(user);
 
         return true;
     }
@@ -67,7 +70,7 @@ class Channel {
         }];
         for (let i=0; i<this.users.length; i++) {
             users.push({
-                'name': this.users[i].name,
+                'name': this.users[i].getName(),
                 'id': this.users[i].id
             });
         }
@@ -75,11 +78,16 @@ class Channel {
     }
     sendText(user, data) {
         let d = this.sanitize(data);
-
-        this.broadcast('channel_text', {
+        let msg = {
             name: user.getName(),
             message: d
-        });
+        };
+
+        this.broadcast('channel_text', msg);
+        this.log.push(msg);
+    }
+    sendLog(user) {
+        user.sendLog(this.log);
     }
 }
 

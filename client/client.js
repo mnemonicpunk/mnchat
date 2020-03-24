@@ -1,4 +1,4 @@
-const SERVER_ADDR = "ws://localhost:8000/chat";
+const SERVER_ADDR = "ws://192.168.0.214:8000/chat";
 const PW_SALT = "FOOBARCOVID19";
 
 class ClientUI {
@@ -10,6 +10,9 @@ class ClientUI {
         this.user_list = document.querySelector('#channel_users');
         this.chat_window = document.querySelector('#chat_content');
 
+        this.show_channels = false;
+        this.show_users = false;
+
         this.chat_box = document.querySelector('#chat_msg_entry');
         this.chat_box.addEventListener('keydown', function(e) {
             if (e.keyCode == 13) {
@@ -17,6 +20,7 @@ class ClientUI {
                 _Instance.chat_box.value = "";
             }
         });
+        this.chat_box.focus();
 
         let dialog_register = document.querySelector("#dialog_register");
         let dialog_login = document.querySelector("#dialog_login");
@@ -34,6 +38,16 @@ class ClientUI {
         dialog_login.querySelector("#login_confirm_btn").addEventListener('click', function() {
             _Instance.doLogin();
         });
+
+        document.querySelector('#channel_toggle').addEventListener('click', function() {
+            _Instance.showChannelList(!_Instance.show_channels);
+        });
+        document.querySelector('#user_toggle').addEventListener('click', function() {
+            _Instance.showUserList(!_Instance.show_users);
+        });
+
+        this.showChannelList(this.show_channels);
+        this.showUserList(this.show_users);
     }
     clearUserList() {
         while (this.user_list.hasChildNodes()) {
@@ -105,7 +119,24 @@ class ClientUI {
         let pw1 = dialog_login.querySelector("#log_pw1").value;
 
         this.client.doLogin(uname, pw1);
-    }    
+    }
+    showChannelList(state) {
+        this.show_channels = state;
+        this.channel_list.style.display = state?"block":"none";
+        this.repositionChat();
+    }
+    showUserList(state) {
+        this.show_users = state;
+        this.user_list.style.display = state?"block":"none";
+        this.repositionChat();
+    }
+    repositionChat() {
+        let chat = document.querySelector('#chat_holder');
+        let l = "left: " + (this.show_channels * 200) + "px; ";
+        let w = "width: calc(100% - " + ((this.show_channels + this.show_users) * 200) + "px);";
+        console.log(w);
+        chat.style = l+w;
+    }
 }
 
 class Client {
@@ -166,6 +197,9 @@ class Client {
             case "error_msg":
                 alert(msg.data);
                 break;
+            case "channel_log":
+                this.getLog(msg.data);
+                break;
             default:
                 break;
         }
@@ -175,6 +209,11 @@ class Client {
     }
     getTextMessage(name, message) {
         this.ui.addTextMessage(name, message);
+    }
+    getLog(log) {
+        for (let i=0; i<log.length; i++) {
+            this.getTextMessage(log[i].name, log[i].message);
+        }
     }
     doRegister(username, password) {
         let uname = username;
