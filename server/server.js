@@ -4,6 +4,7 @@ const TOKEN_PATH = "./data/token/";
 var fs = require('fs');
 var User = require('./user.js');
 var Channel = require('./channel.js');
+var Account = require('./account.js');
 
 var CHANNEL_CFG = require('../config/channels.json');
 
@@ -28,8 +29,13 @@ class Server {
         }
         this.system_channel = this.channels[0];
 
-        console.log(this.registerAccount("joshua", "12345"));
-        console.log(this.loginAccount("Joshua", "12345"));
+        let n = "joshua";
+        let pwh = "12345";
+        let a = null;
+        if (this.authWithToken(n, this.loginAccount(n, pwh))) {
+            a = new Account(n);
+        }
+        console.dir(a);
     }
     connectUser(ws) {
         var u = new User(ws, this);
@@ -115,7 +121,7 @@ class Server {
         let a = JSON.parse(fs.readFileSync(fn).toString('utf8'));
         if (a.pw_hash != pw_hash) { return null; }
 
-        let token = this.getAccountToken(name);
+        let token = this.getAccountToken(name, true);
         return token;
     }
     existsAccount(name) {
@@ -134,16 +140,32 @@ class Server {
         };
         fs.writeFileSync(fn, JSON.stringify(data));
     }
-    getAccountToken(name) {
+    getAccountToken(name, create_if_needed) {
         let n = this.getAccountNameFromString(name);
         let fn = TOKEN_PATH + n + ".token";
 
         if (!fs.existsSync(TOKEN_PATH + n + ".token")) {
-            this.createAccountToken(name);
+            if (create_if_needed) {
+                this.createAccountToken(name);
+            } else {
+                return null;
+            }
+            
         }
 
         let token = JSON.parse(fs.readFileSync(fn).toString('utf8'));
         return token;
+    }
+    authWithToken(name, token) {
+        let compare_token = this.getAccountToken(name, false);
+        if (token == null) { return false; }
+        if (compare_token == null) { return false; }
+
+        if (token.token == compare_token.token) {
+            return true;
+        }
+
+        return false;
     }
 }
 
