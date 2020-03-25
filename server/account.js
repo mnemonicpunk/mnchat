@@ -52,6 +52,9 @@ class Account {
 
         return ctext;
     }
+    getAccountName() {
+        return this.getAccountNameFromString(this.data.name);
+    }
     getAccessLevel() {
         return this.data.access;
     }

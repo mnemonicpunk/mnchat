@@ -1,4 +1,5 @@
 var Account = require('./account.js');
+var Command = require('./command.js');
 
 const KEEP_ALIVE_PING = 10;
 const KEEP_ALIVE_TIMEOUT = 30;
@@ -131,42 +132,8 @@ class User {
         }
     }
     parseCommand(text) {
-        let segment = text.split(" ");
-        let cmd = segment[0];
-        switch(cmd) {
-            case "/groups":
-                let reply = "Die Gruppen auf diesem Server sind:<br>";
-                for (let i=0; i<this.server.groups.length; i++) {
-                    reply += this.server.groups[i].getName() + "<br>";
-                }
-                this.receiveBotMessage(reply);
-                break;
-            case "/add_to_group":
-                let acc = segment[1];
-                let g = segment[2];
-                
-                // sanity checks
-                if (!this.server.existsAccount(acc)) { 
-                    this.receiveBotMessage('Der Account ' + acc + ' existiert nicht.');
-                    break; 
-                }
-                if (!this.server.existsGroup(g)) { 
-                    this.receiveBotMessage('Die Gruppe ' + g + ' existiert nicht.');
-                    break; 
-                }
-
-                // privilege checks
-                let group = this.server.getGroup(g);
-                if (!(group.isAdmin(acc) || this.isAdmin())) { 
-                    this.receiveBotMessage('Du hast nicht die Berechtigung, jemanden zu ' + g + ' hinzuzufügen.');
-                    break; 
-                }
-                group.addMember(acc);
-                this.receiveBotMessage('Erledigt.');
-                break;
-            default:
-                break;
-        }
+        let cmd = new Command(this);
+        cmd.parseCommand(text);
     }
     receiveBotMessage(message) {
         this.receivePrivateMessage({

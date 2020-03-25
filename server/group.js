@@ -51,8 +51,14 @@ class Group {
     getMembers() {
         return this.data.members;
     }
-    isMember(name) {
-        return (name in this.data.members);
+    isMember(user) {
+        let name = user.account.getAccountName();
+        for (let i=0; i<this.data.members.length; i++) {
+            if (this.data.members[i] == name) {
+                return true;
+            }
+        }
+        return false;
     }
     addMember(name) {
         if (!(name in this.data.members)) {
@@ -73,8 +79,14 @@ class Group {
     getAdmins() {
         return this.data.admins;
     }
-    isAdmin(name) {
-        return (name in this.data.admins);
+    isAdmin(user) {
+        let name = user.account.getAccountName();
+        for (let i=0; i<this.data.admins.length; i++) {
+            if (this.data.admins[i] == name) {
+                return true;
+            }
+        }
+        return false;
     }
     addAdmin(name) {
         if (!(name in this.data.admins)) {
