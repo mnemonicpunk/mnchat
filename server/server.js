@@ -1,10 +1,17 @@
 const ACCOUNT_PATH = "./data/account/";
 const TOKEN_PATH = "./data/token/";
+const GROUP_PATH = "./data/group/";
+
+const ACCESS_LEVELS = {
+    USER: 0,
+    ADMIN: 10
+}
 
 var fs = require('fs');
 var User = require('./user.js');
 var Channel = require('./channel.js');
 var Account = require('./account.js');
+var Group = require('./group.js');
 
 var CHANNEL_CFG = require('../config/channels.json');
 
@@ -22,12 +29,26 @@ class Server {
     constructor() {
         this.users = [];
         this.channels = [];
+        this.groups = [];
 
+        console.log("Loading channels...");
         for (let i=0; i<CHANNEL_CFG.length; i++) {
             let c = new Channel(CHANNEL_CFG[i].name);
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
+        console.log("Channels loaded.");
+
+
+        console.log("Loading groups...");
+        let load_groups = fs.readdirSync(GROUP_PATH);
+        for (let i=0; i<load_groups.length; i++) {
+            let n = load_groups[i].split('.');
+            let g = new Group(n[0]);
+            this.groups.push(g);
+        }
+        console.dir(this.groups);
+        console.log("Groups loaded.");
 
         var _Instance = this;
         var _tick = function() {
@@ -115,7 +136,8 @@ class Server {
 
         let data = {
             name: name,
-            pw_hash: pw_hash
+            pw_hash: pw_hash,
+            access: ACCESS_LEVELS.USER
         }
 
         if (!this.existsAccount(n)) {
@@ -176,6 +198,17 @@ class Server {
         }
 
         return false;
+    }
+    getGroup(name) {
+        for (let i=0; i<this.groups.length; i++) {
+            if (this.groups[i].getName() == name) {
+                return this.groups[i];
+            }
+        }
+        return null;
+    }
+    existsGroup(name) {
+        return (this.getGroup(name) != null);
     }
 }
 

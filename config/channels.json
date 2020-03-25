@@ -1,14 +1,23 @@
 [
     {
         "name": "Allgemein",
-        "permissions": [] 
+        "permissions": {
+            "join": [],
+            "text": []
+        }
     },
     {
         "name": "Eltern",
-        "permissions": [] 
+        "permissions": {
+            "join": [],
+            "text": []
+        }
     },
     {
         "name": "GHS F5C",
-        "permissions": [] 
+        "permissions": {
+            "join": [],
+            "text": []
+        }
     }    
 ]

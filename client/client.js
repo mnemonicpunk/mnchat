@@ -211,6 +211,27 @@ class ClientUI {
 
         this.chat_window.appendChild(el);
     }
+    addPrivateMessage(msg) {
+        let name = msg.sender.name;
+        let message = msg.message;
+
+        let el = document.createElement('div');
+        el.className = "private_message";
+
+        let el_user = document.createElement('div');
+        let el_text = document.createElement('div');
+
+        el_user.className = "private_message_user";
+        el_text.className = "private_message_text";
+
+        el_user.innerHTML = name + " (privat)";
+        el_text.innerHTML = message;
+
+        el.appendChild(el_user);
+        el.appendChild(el_text);
+
+        this.chat_window.appendChild(el);
+    }    
     modalDialog(name) {
         let dialog_register = document.querySelector("#dialog_register");
         let dialog_login = document.querySelector("#dialog_login");
@@ -316,6 +337,9 @@ class Client {
             case "channel_text":
                 this.getTextMessage(msg.data);
                 break;
+            case "private_message":
+                this.getPrivateMessage(msg.data);
+                break;    
             case "channel_name":
                 this.ui.setChannelName(msg.data);
                 break;
@@ -355,6 +379,9 @@ class Client {
     getTextMessage(message) {
         this.ui.addTextMessage(message);
     }
+    getPrivateMessage(message) {
+        this.ui.addPrivateMessage(message);
+    }    
     getLog(log) {
         this.ui.clearMessages();
         for (let i=0; i<log.length; i++) {

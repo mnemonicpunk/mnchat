@@ -20,12 +20,10 @@ class User {
         this.socket.on('close', function(e) {
             _Instance.leaveChannel();
             _Instance.server.disconnectUser(_Instance);
-            console.log("User " + _Instance.id + " has disconnected.");
         });
         this.socket.on('error', function(e) {
             _Instance.leaveChannel();
             _Instance.server.disconnectUser(_Instance);
-            console.log("User " + _Instance.id + " has disconnected.");
         });        
 
         this.keep_alive = 0;
@@ -103,6 +101,10 @@ class User {
         if (this.account == null) { return "Anonymous"; }
         return (this.account.data.name);
     }
+    isAdmin() {
+        if (this.account == null) { return false; }
+        return this.account.isAdmin();
+    }
     joinChannel(c) {
         if (c.canJoin(this)) {
             this.leaveChannel();
@@ -119,10 +121,63 @@ class User {
     }
     sendTextToChannel(data) {
         if (this.channel != null) {
-            this.channel.sendText(this, data);
+            if (data[0] == "/") {
+                this.parseCommand(data);
+            } else {
+                this.channel.sendText(this, data);
+            }
         } else {
             this.errorMessage("Um Nachrichten senden zu können musst du dich in einem Channel befinden.");
         }
+    }
+    parseCommand(text) {
+        let segment = text.split(" ");
+        let cmd = segment[0];
+        switch(cmd) {
+            case "/groups":
+                let reply = "Die Gruppen auf diesem Server sind:<br>";
+                for (let i=0; i<this.server.groups.length; i++) {
+                    reply += this.server.groups[i].getName() + "<br>";
+                }
+                this.receiveBotMessage(reply);
+                break;
+            case "/add_to_group":
+                let acc = segment[1];
+                let g = segment[2];
+                
+                // sanity checks
+                if (!this.server.existsAccount(acc)) { 
+                    this.receiveBotMessage('Der Account ' + acc + ' existiert nicht.');
+                    break; 
+                }
+                if (!this.server.existsGroup(g)) { 
+                    this.receiveBotMessage('Die Gruppe ' + g + ' existiert nicht.');
+                    break; 
+                }
+
+                // privilege checks
+                let group = this.server.getGroup(g);
+                if (!(group.isAdmin(acc) || this.isAdmin())) { 
+                    this.receiveBotMessage('Du hast nicht die Berechtigung, jemanden zu ' + g + ' hinzuzufügen.');
+                    break; 
+                }
+                group.addMember(acc);
+                this.receiveBotMessage('Erledigt.');
+                break;
+            default:
+                break;
+        }
+    }
+    receiveBotMessage(message) {
+        this.receivePrivateMessage({
+            name: "Nanny"
+        }, message);
+    }
+    receivePrivateMessage(sender, message) {
+        this.sendMessage('private_message', {
+            sender: sender,
+            message: message
+        });
     }
     doRegister(name, pw_hash) {
         let state = this.server.registerAccount(name, pw_hash);

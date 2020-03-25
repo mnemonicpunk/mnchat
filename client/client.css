@@ -3,6 +3,7 @@
     --main-bg-color: #557;
     --menu-bg-color: #335;
     --main-font-color: #ddd;
+    --pmsg-bg-color: #336;
     --msg-bg-color: #446;
 }
 
@@ -220,5 +221,23 @@ body {
 }
 
 .chat_message_text {
+    padding: 10px;
+}
+
+.private_message {
+    background: var(--pmsg-bg-color);
+    padding: 10px;
+    //line-height: 20px;
+}
+
+.private_message_user {
+    background: var(--msg-bg-color);
+    float: left;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 10px;
+}
+
+.private_message_text {
     padding: 10px;
 }
