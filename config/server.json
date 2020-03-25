@@ -2,5 +2,7 @@
     "port": 8000,
     "https": false,
     "cert_path": "~/etc/certificates",
+    "cert_crt": "mchat.uber.space.crt",
+    "cert_key": "mchat.uber.space.key",
     "default_channel": "Allgemein"
 }
