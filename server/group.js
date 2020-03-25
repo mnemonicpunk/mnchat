@@ -4,46 +4,21 @@ const ACCESS_LEVELS = {
     ADMIN: 10
 }
 
-var fs = require('fs');
+var ServerObject = require('./server_object.js');
 
-class Group {
+class Group extends ServerObject {
     constructor(name) {
-        let n = this.getGroupNameFromString(name);
-        let fn = GROUP_PATH + n + ".group";
-
-        this.data = {
+        super(name, GROUP_PATH, 'group', {
             name: name,
             admins: [],
             members: []
-        }
-        if (this.existsGroup(name)) { 
-            this.data = JSON.parse(fs.readFileSync(fn).toString('utf8'));
-        }
+        });
     }
-    save() {
-        let n = this.getGroupNameFromString(this.data.name);
-        let fn = GROUP_PATH + n + ".group";
-
-        fs.writeFileSync(fn, JSON.stringify(this.data), { flag: 'w'});
-    }   
     existsGroup(name) {
-        let n = this.getGroupNameFromString(name);
-        return fs.existsSync(GROUP_PATH + n + ".group");
+        return super.existsObject(name);
     }    
     getGroupNameFromString(text) {
-        let valid_characters = "abcdefghijklmnopqrstuvwxyz1234567890";
-        let ctext = "";
-
-        for (let i=0; i<text.length; i++) {
-            let c = text[i].toLowerCase();
-            for (let j = 0; j<valid_characters.length; j++) {
-                if (c == valid_characters[j]) {
-                    ctext += c;
-                }
-            }
-        }
-
-        return ctext;
+        return super.toFilename(text);
     }
     getName() {
         return this.data.name;

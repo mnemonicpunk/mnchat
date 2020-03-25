@@ -1,6 +1,7 @@
 const ACCOUNT_PATH = "./data/account/";
 const TOKEN_PATH = "./data/token/";
 const GROUP_PATH = "./data/group/";
+const CHANNEL_PATH = "./data/channel/";
 
 const ACCESS_LEVELS = {
     USER: 0,
@@ -12,8 +13,6 @@ var User = require('./user.js');
 var Channel = require('./channel.js');
 var Account = require('./account.js');
 var Group = require('./group.js');
-
-var CHANNEL_CFG = require('../config/channels.json');
 
 var genString = function(length) {
     var result           = '';
@@ -32,8 +31,10 @@ class Server {
         this.groups = [];
 
         console.log("Loading channels...");
-        for (let i=0; i<CHANNEL_CFG.length; i++) {
-            let c = new Channel(CHANNEL_CFG[i].name);
+        let load_channels = fs.readdirSync(CHANNEL_PATH);
+        for (let i=0; i<load_channels.length; i++) {
+            let n = load_channels[i].split('.');
+            let c = new Channel(n[0], this);
             this.channels.push(c);
         }
         this.system_channel = this.channels[0];
@@ -47,7 +48,6 @@ class Server {
             let g = new Group(n[0]);
             this.groups.push(g);
         }
-        console.dir(this.groups);
         console.log("Groups loaded.");
 
         var _Instance = this;
@@ -99,7 +99,7 @@ class Server {
     }
     getChannelByName(name) {
         for (let i=0; i<this.channels.length; i++) {
-            if (this.channels[i].name == name) {
+            if (this.channels[i].data.name == name) {
                 return this.channels[i];
             }
         }
@@ -109,7 +109,7 @@ class Server {
         let l = [];
         for (let i=0; i<this.channels.length; i++) {
             l.push({
-                name: this.channels[i].name,
+                name: this.channels[i].data.name,
                 id: i
             });
         }
@@ -201,6 +201,9 @@ class Server {
     }
     getGroup(name) {
         for (let i=0; i<this.groups.length; i++) {
+            if (this.groups[i].name == name) {
+                return this.groups[i];
+            }
             if (this.groups[i].getName() == name) {
                 return this.groups[i];
             }

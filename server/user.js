@@ -112,6 +112,8 @@ class User {
             if (c.join(this)) {
                 this.channel = c;
             }
+        } else {
+            this.receiveBotMessage("Du hast nicht die Berechtigung, den Raum " + c.data.name + " zu betreten.");
         }
     }
     leaveChannel() {
@@ -125,7 +127,11 @@ class User {
             if (data[0] == "/") {
                 this.parseCommand(data);
             } else {
-                this.channel.sendText(this, data);
+                if (this.channel.checkPermission(this, "text")) {
+                    this.channel.sendText(this, data);
+                } else {
+                    this.receiveBotMessage("Du hast nicht die Berechtigung, im Raum " + this.channel.data.name + " zu schreiben.");
+                }
             }
         } else {
             this.errorMessage("Um Nachrichten senden zu können musst du dich in einem Channel befinden.");

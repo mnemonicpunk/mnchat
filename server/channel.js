@@ -1,11 +1,21 @@
+const CHANNEL_PATH = "./data/channel/";
 const BOTNAME = "Nanny";
 
-class Channel {
-    constructor(name) {
-        this.name = name;
+var ServerObject = require('./server_object.js');
+
+class Channel extends ServerObject {
+    constructor(name, server) {
+        super(name, CHANNEL_PATH, "channel", {
+            name: name,
+            permissions: {
+                join: [],
+                text: []
+            }
+        });
+
+        this.server = server;
         this.users = [];
         this.messages = [];
-
         this.log = [];
     }
     addUser(user) {
@@ -26,7 +36,23 @@ class Channel {
     }
     canJoin(user) {
         if (user.account == null) { return false; }
-        return true;
+        return this.checkPermission(user, "join");
+    }
+    checkPermission(user, perm) {
+        let perms = this.data.permissions[perm];
+
+        if (perms.length == 0) {
+            return true;
+        }
+
+        for (let i=0; i<perms.length; i++) {
+            let group = this.server.getGroup(perms[i]);
+            if (group.isMember(user) || group.isAdmin(user)) {
+                return true;
+            }
+        }
+
+        return false;
     }
     broadcast(type, data) {
         let msg = {
@@ -95,7 +121,7 @@ class Channel {
         this.log.push(msg);
     }
     sendChannelName(user) {
-        user.sendMessage('channel_name', this.name);
+        user.sendMessage('channel_name', this.data.name);
     }
     sendLog(user) {
         user.sendLog(this.log);

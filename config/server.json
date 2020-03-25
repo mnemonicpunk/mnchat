@@ -1,0 +1,6 @@
+{
+    "port": 8000,
+    "https": false,
+    "cert_path": "~/etc/certificates",
+    "default_channel": "Allgemein"
+}

@@ -5,6 +5,7 @@ class Command {
     parseCommand(command_string) {
         let segment = command_string.split(" ");
         let cmd = segment[0];
+
         switch(cmd) {
             case "/groups":
                 this.cmdGroups();
@@ -24,6 +25,9 @@ class Command {
             case "/remove_from_group_admins":
                 this.cmdRemoveFromGroupAdmin(segment[1], segment[2]);
                 break;        
+            case "/create_group":
+                //this.cmdRemoveFromGroupAdmin(segment[1], segment[2]);
+                break;            
             default:
                 break;
         }
