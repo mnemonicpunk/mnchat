@@ -10,105 +10,72 @@ body {
     padding: 0;
     margin: 0;
     font-family: Segoe UI, Arial;
-
     color: var(--main-font-color);;
 }
 
-#menu_bar {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: calc(100% - 40px);
-    height: 20px;
+#dialog_chat {
+    width: 100%;
+    height: 100%;
+}
 
+#menu_bar {
     background: var(--menu-bar-color);
     color: var(--main-font-color);
-    line-height: 20px;
-    padding: 20px;
 }
 
-.menu_segment_small {
-    width: 200px;
-    height: 100%;
-    display: inline-block;
-    text-align: center;
+.menu_toggle {
     user-select: none;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    text-decoration: underline;
 }
 
-.menu_segment_small:hover {
+.menu_toggle:hover {
     background: var(--menu-bg-color);
-    border-radius: 5px;
     cursor: pointer;
     user-select: none;
 }
 
 .menu_segment_large {
-    width: calc(100% - 420px);
-    height: 100%;
+    font-size: 150%;
     display: inline-block;
-    text-align: center;
     user-select: none;
+    vertical-align: middle;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
-#channel_list {
-    position: absolute;
-    top: 60px;
-    left: 0px;
-
-    width: calc(200px - 20px);
-    height: calc(100% - 80px);
-
-    padding: 10px;
-    
+#channel_list {    
     background:  var(--menu-bg-color);;
 }
 
-#chat_holder {
-    position: absolute;
-    top: 60px;
-    left: 200px;
-
-    height: calc(100% - 60px);
-    background:  var(--main-bg-color);
-}
-
 #channel_users {
-    position: absolute;
-    top: 60px;
-    left: calc(100% - 200px);
-
-    width: 180px;
-    height: calc(100% - 80px);
-
-    padding: 10px;
-
     background: var(--menu-bg-color);
 }
 
 #chat_content {
-    width: calc(100% - 20px);
-    height: calc(100% - 80px);
-    margin: 10px;
     background: var(--main-bg-color);
-
     overflow: auto;
 }
 
 #chat_text {
     width: 100%;
-    height: 60px;
-    line-height: 60px;
+    height: 100%;
     background: var(--main-bg-color);
 }
 
 #chat_text input[type="edit"] {
     width: calc(100% - 20px);
-    height: 40px;
+    height: calc(100% - 20px);
 
     background: var(--msg-bg-color);
     color: var(--main-font-color);
-    padding-left: 10px;
-    padding-right: 10px;
+    padding: 10px;
+    margin-top: 10px;
     margin-left: 10px;
     margin-right: 10px;
 
@@ -119,6 +86,7 @@ body {
 }
 
 .channel_list_entry {
+    margin: 10px;
     padding: 10px;
     overflow: hidden;
 }
@@ -130,6 +98,7 @@ body {
 }
 
 .user_list_entry {
+    margin: 10px;
     padding: 10px;
     overflow: hidden;
 }
@@ -239,7 +208,7 @@ body {
 
 .chat_message {
     padding: 10px;
-    line-height: 20px;
+    //line-height: 20px;
 }
 
 .chat_message_user {
