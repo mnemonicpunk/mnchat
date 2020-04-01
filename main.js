@@ -17,7 +17,7 @@ app.ws('/chat', function(ws, req) {
 });
 
 let web_server = app;
-if (SERVER_CFG.HTTPS == true) {
+if (SERVER_CFG.https == true) {
   web_server = https.createServer({
     key: fs.readFileSync(SERVER_CFG.cert_path + '/' + SERVER_CFG.cert_key),
     cert: fs.readFileSync(SERVER_CFG.cert_path + '/' + SERVER_CFG.cert_crt)

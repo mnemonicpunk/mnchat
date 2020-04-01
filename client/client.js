@@ -364,7 +364,7 @@ class Client {
                 break;
             case "auth_failed":
                 this.setCredentials("", "");
-                this.modalDialog("register");
+                this.ui.modalDialog("register");
                 break;
             case "keep_alive":
                 this.sendMessage('keep_alive', {});
