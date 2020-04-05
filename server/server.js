@@ -8,6 +8,8 @@ const ACCESS_LEVELS = {
     ADMIN: 10
 }
 
+const FLUSH_AFTER = 10;
+
 var fs = require('fs');
 var User = require('./user.js');
 var Channel = require('./channel.js');
@@ -29,6 +31,20 @@ class Server {
         this.users = [];
         this.channels = [];
         this.groups = [];
+        this.tick_counter = 0;
+
+        // assert that the required directories exist
+        let dirs = ['account', 'channel', 'group', 'log', 'token'];
+        let prefix = "./data/";
+        for (let i=0; i<dirs.length; i++) {
+            let p = prefix + dirs[i];
+            if (!fs.existsSync(p)) {
+                fs.mkdirSync(p);
+                console.log("Data directory '" + p + "' has been created.");
+            }
+        }
+
+        // end assert
 
         console.log("Loading channels...");
         let load_channels = fs.readdirSync(CHANNEL_PATH);
@@ -60,6 +76,11 @@ class Server {
     tick() {
         for (let i=0; i<this.users.length; i++) {
             this.users[i].tick();
+        }
+        this.tick_counter++;
+        if (this.tick_counter >= FLUSH_AFTER) {
+            this.flush();
+            this.tick_counter = 0;
         }
     }
     connectUser(ws) {
@@ -212,6 +233,11 @@ class Server {
     }
     existsGroup(name) {
         return (this.getGroup(name) != null);
+    }
+    flush() {
+        for (let i=0; i<this.channels.length; i++) {
+            this.channels[i].commitLog();
+        }
     }
 }
 

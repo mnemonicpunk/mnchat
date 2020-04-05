@@ -193,6 +193,8 @@ class ClientUI {
     addTextMessage(msg) {
         let name = msg.name;
         let message = msg.message;
+        let date = new Date(msg.timestamp);
+        let timestamp = date.getHours() + ":" + date.getMinutes();
 
         let el = document.createElement('div');
         el.className = "chat_message";
@@ -203,7 +205,7 @@ class ClientUI {
         el_user.className = "chat_message_user";
         el_text.className = "chat_message_text";
 
-        el_user.innerHTML = name;
+        el_user.innerHTML = "[" + timestamp + "] " + name;
         el_text.innerHTML = message;
 
         el.appendChild(el_user);

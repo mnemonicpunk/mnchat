@@ -1,7 +1,9 @@
 const CHANNEL_PATH = "./data/channel/";
 const BOTNAME = "Nanny";
+const LOGGED_MESSAGES = 100;
 
 var ServerObject = require('./server_object.js');
+var Log = require('./log.js');
 
 class Channel extends ServerObject {
     constructor(name, server) {
@@ -16,7 +18,9 @@ class Channel extends ServerObject {
         this.server = server;
         this.users = [];
         this.messages = [];
-        this.log = [];
+
+        this.logger = new Log(name);
+        this.log = this.logger.getLog(LOGGED_MESSAGES);
     }
     addUser(user) {
         if (!(user in this.users)) {
@@ -24,15 +28,6 @@ class Channel extends ServerObject {
         } else {
             console.log("User tried to join channel twice? o.O");
         }
-    }
-    addMessage(user_name, msg) {
-        this.messages.push({
-            name: user_name,
-            msg: msg
-        });
-    }
-    getMessages() {
-        return this.messages;
     }
     canJoin(user) {
         if (user.account == null) { return false; }
@@ -114,7 +109,8 @@ class Channel extends ServerObject {
 
         let msg = {
             name: user.getName(),
-            message: d
+            message: d,
+            timestamp: new Date()
         };
 
         this.broadcast('channel_text', msg);
@@ -122,6 +118,9 @@ class Channel extends ServerObject {
     }
     sendChannelName(user) {
         user.sendMessage('channel_name', this.data.name);
+    }
+    commitLog() {
+        this.logger.commitLog(this.log);
     }
     sendLog(user) {
         user.sendLog(this.log);
